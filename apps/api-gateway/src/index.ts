@@ -4,6 +4,7 @@ import { ApolloServer } from "apollo-server";
 import { buildSchema } from "type-graphql";
 
 import LocationResolver from "./resolvers/location/location-resolver";
+import CityResolver from "./resolvers/city/cities-resolver";
 
 import { IncomingMessage, ServerResponse } from "http";
 import { Container } from "typedi";
@@ -11,7 +12,7 @@ import { Container } from "typedi";
 import { setFunctionalServices } from "./di";
 
 const dev = false;
-const resolvers = [LocationResolver] as any;
+const resolvers = [LocationResolver, CityResolver] as any;
 
 /** Initiate container */
 setFunctionalServices();
