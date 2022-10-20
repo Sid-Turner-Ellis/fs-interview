@@ -18,7 +18,7 @@ import { falsyToInvalidId, whereIdIs } from "../../shared/utils";
 @Service()
 @Resolver((resolverOf) => LocationEntity)
 export default class LocationResolver {
-  constructor(private readonly locationService: LocationService) {}
+  constructor(private readonly locationService: LocationService) { }
 
   @Query(() => [LocationEntity])
   async getAllLocations(): Promise<LocationEntity[]> {
@@ -30,7 +30,15 @@ export default class LocationResolver {
 
     throw new Error("LocationResolver.getAllLocations");
   }
+  @Query(() => LocationEntity)
+  async getLocation(@Arg("id") id: string): Promise<LocationEntity> {
+    const getItem = await this.locationService._findById(id);
+    if (getItem.id) {
+      return getItem
+    }
+    throw new Error("LocationResolver.getLocation");
 
+  }
   @Mutation(() => String)
   async deleteLocation(@Arg("id") id: string): Promise<string> {
     const deleteResult = await this.locationService.delete(id);
@@ -57,12 +65,16 @@ export default class LocationResolver {
   }
 
   @Mutation(() => LocationEntity)
-  async createCity(
+  async updateCity(
     @Arg("locationId") locationId: string,
-    @Arg("cityName") cityName: string
-  ) {
+    @Arg("cityIdsToRemove", () => [String]) cityIdsToRemove?: string[],
+    @Arg("cityNamesToAdd", () => [String]) cityNamesToAdd?: string[],
+    @Arg("countryName") countryName?: string,
+  ): Promise<LocationEntity> {
     const result = await this.locationService.update(locationId, {
-      cityNamesToAdd: [cityName],
+      cityIdsToRemove,
+      cityNamesToAdd,
+      countryName,
     });
 
     if (result.isOk()) {

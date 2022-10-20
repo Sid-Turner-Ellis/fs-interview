@@ -7,7 +7,6 @@ const mappings = {
 const getMapper = (resourceName, methodName) => {
   const mapper = mappings[resourceName][methodName];
 
-  console.log("Mapper found", resourceName, methodName, mapper);
   if (!mapper) {
     throw new Error(`Mapper not found for: ${resourceName}:${methodName}`);
   }
@@ -22,7 +21,8 @@ const dataProvider = {
   },
 
   getOne: async (resource, params) => {
-    throw new Error("not implemented");
+    const mapper = getMapper(resource, "getOne");
+    return await mapper(params);
   },
   getMany: async (resource, params) => {
     throw new Error("not implemented");
@@ -35,7 +35,9 @@ const dataProvider = {
     return await mapper(params);
   },
   update: async (resource, params) => {
-    throw new Error("not implemented");
+    console.log("params", params);
+    const mapper = getMapper(resource, "update");
+    return await mapper(params);
   },
   updateMany: async (resource, params) => {
     throw new Error("not implemented");

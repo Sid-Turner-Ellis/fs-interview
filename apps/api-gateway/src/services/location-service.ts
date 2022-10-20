@@ -18,11 +18,11 @@ export class LocationService {
     private locationRepository: typeof LocationRepository,
     @Inject("CityRepository")
     private cityRepository: typeof CityRepository
-  ) {}
+  ) { }
 
   private _relations = ["cities"];
 
-  private async _findById(id: string): Promise<LocationEntity> {
+  public async _findById(id: string): Promise<LocationEntity> {
     const location = await this.locationRepository.findOne({
       ...whereIdIs(id),
       relations: this._relations,
@@ -85,9 +85,11 @@ export class LocationService {
     {
       cityIdsToRemove = [],
       cityNamesToAdd = [],
+      countryName = "",
     }: {
       cityNamesToAdd?: string[];
       cityIdsToRemove?: string[];
+      countryName?: string;
     }
   ): Promise<ResultAsync<LocationEntity, null>> {
     try {
@@ -108,6 +110,9 @@ export class LocationService {
           (city) => !cityIdsToRemove.includes(city.id)
         );
       });
+      if (countryName) {
+        location.countryName = countryName;
+      }
 
       const saved = await this.locationRepository.save(location);
       const refreshed = await this._findById(saved.id);
