@@ -9,10 +9,8 @@ import {
   Root,
 } from "type-graphql";
 import { Service } from "typedi";
-import { BaseEntity } from "typeorm";
-import { dataSource } from "../../data-source";
 import { LocationEntity } from "../../entities";
-import { LocationService } from "../../services/location-service";
+import { LocationService } from "../../services";
 import { falsyToInvalidId, whereIdIs } from "../../shared/utils";
 
 @Service()
@@ -30,6 +28,7 @@ export default class LocationResolver {
 
     throw new Error("LocationResolver.getAllLocations");
   }
+
 
   @Mutation(() => String)
   async deleteLocation(@Arg("id") id: string): Promise<string> {
@@ -58,10 +57,10 @@ export default class LocationResolver {
 
   @Mutation(() => LocationEntity)
   async createCity(
-    @Arg("locationId") locationId: string,
+    @Arg("location") location: string,
     @Arg("cityName") cityName: string
   ) {
-    const result = await this.locationService.update(locationId, {
+    const result = await this.locationService.update(location, {
       cityNamesToAdd: [cityName],
     });
 

@@ -3,7 +3,7 @@ import Container from "typedi";
 import {
   CityRepository,
   LocationRepository,
-} from "./services/location-service";
+} from "./services";
 
 
 
