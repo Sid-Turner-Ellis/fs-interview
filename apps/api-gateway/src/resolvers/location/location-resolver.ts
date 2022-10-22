@@ -1,12 +1,12 @@
 import { Context, UserInputError } from "apollo-server-core";
 import {
-  Resolver,
-  Query,
-  Mutation,
-  Arg,
-  Ctx,
-  FieldResolver,
-  Root,
+	Resolver,
+	Query,
+	Mutation,
+	Arg,
+	Ctx,
+	FieldResolver,
+	Root,
 } from "type-graphql";
 import { Service } from "typedi";
 import { BaseEntity } from "typeorm";
@@ -16,59 +16,59 @@ import { LocationService } from "../../services/location-service";
 import { falsyToInvalidId, whereIdIs } from "../../shared/utils";
 
 @Service()
-@Resolver((resolverOf) => LocationEntity)
+@Resolver(resolverOf => LocationEntity)
 export default class LocationResolver {
-  constructor(private readonly locationService: LocationService) {}
+	constructor(private readonly locationService: LocationService) {}
 
-  @Query(() => [LocationEntity])
-  async getAllLocations(): Promise<LocationEntity[]> {
-    const locationsResult = await this.locationService.findAll();
+	@Query(() => [LocationEntity])
+	async getAllLocations(): Promise<LocationEntity[]> {
+		const locationsResult = await this.locationService.findAll();
 
-    if (locationsResult.isOk()) {
-      return locationsResult.value;
-    }
+		if (locationsResult.isOk()) {
+			return locationsResult.value;
+		}
 
-    throw new Error("LocationResolver.getAllLocations");
-  }
+		throw new Error("LocationResolver.getAllLocations");
+	}
 
-  @Mutation(() => String)
-  async deleteLocation(@Arg("id") id: string): Promise<string> {
-    const deleteResult = await this.locationService.delete(id);
+	@Mutation(() => String)
+	async deleteLocation(@Arg("id") id: string): Promise<string> {
+		const deleteResult = await this.locationService.delete(id);
 
-    if (deleteResult.isOk()) {
-      return deleteResult.value;
-    }
+		if (deleteResult.isOk()) {
+			return deleteResult.value;
+		}
 
-    throw new Error("LocationResolver.deleteLocation");
-  }
+		throw new Error("LocationResolver.deleteLocation");
+	}
 
-  @Mutation(() => LocationEntity)
-  async createLocation(
-    @Arg("countryName") countryName: string,
-    @Arg("cities", () => [String]) cities?: string[]
-  ) {
-    const createResult = await this.locationService.create(countryName, cities);
+	@Mutation(() => LocationEntity)
+	async createLocation(
+		@Arg("countryName") countryName: string,
+		@Arg("cities", () => [String]) cities?: string[]
+	) {
+		const createResult = await this.locationService.create(countryName, cities);
 
-    if (createResult.isOk()) {
-      return createResult.value;
-    }
+		if (createResult.isOk()) {
+			return createResult.value;
+		}
 
-    throw new Error("LocationResolver.create");
-  }
+		throw new Error("LocationResolver.create");
+	}
 
-  @Mutation(() => LocationEntity)
-  async createCity(
-    @Arg("locationId") locationId: string,
-    @Arg("cityName") cityName: string
-  ) {
-    const result = await this.locationService.update(locationId, {
-      cityNamesToAdd: [cityName],
-    });
+	@Mutation(() => LocationEntity)
+	async createCity(
+		@Arg("locationId") locationId: string,
+		@Arg("cityName") cityName: string
+	) {
+		const result = await this.locationService.update(locationId, {
+			cityNamesToAdd: [cityName],
+		});
 
-    if (result.isOk()) {
-      return result.value;
-    }
+		if (result.isOk()) {
+			return result.value;
+		}
 
-    throw new Error("LocationResolver.createCity");
-  }
+		throw new Error("LocationResolver.createCity");
+	}
 }

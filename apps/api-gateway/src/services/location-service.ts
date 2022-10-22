@@ -6,127 +6,129 @@ import { dataSource } from "../data-source";
 import { falsyToInvalidId, whereIdIs } from "../shared/utils";
 
 export const LocationRepository = dataSource
-  .getRepository(LocationEntity)
-  .extend({});
+	.getRepository(LocationEntity)
+	.extend({});
 
 export const CityRepository = dataSource.getRepository(CityEntity).extend({});
 
 @Service()
 export class LocationService {
-  constructor(
-    @Inject("LocationRepository")
-    private locationRepository: typeof LocationRepository,
-    @Inject("CityRepository")
-    private cityRepository: typeof CityRepository
-  ) {}
+	constructor(
+		@Inject("LocationRepository")
+		private locationRepository: typeof LocationRepository,
+		@Inject("CityRepository")
+		private cityRepository: typeof CityRepository
+	) {}
 
-  private _relations = ["cities"];
+	private _relations = ["cities"];
 
-  private async _findById(id: string): Promise<LocationEntity> {
-    const location = await this.locationRepository.findOne({
-      ...whereIdIs(id),
-      relations: this._relations,
-    });
+	private async _findById(id: string): Promise<LocationEntity> {
+		const location = await this.locationRepository.findOne({
+			...whereIdIs(id),
+			relations: this._relations,
+		});
 
-    if (!location) {
-      throw new Error("Location not found");
-    }
+		if (!location) {
+			throw new Error("Location not found");
+		}
 
-    return location;
-  }
+		return location;
+	}
 
-  public async delete(id: string): Promise<ResultAsync<string, null>> {
-    try {
-      const location = await this._findById(id);
-      if (!location) {
-        throw new Error("Location not found");
-      }
-      await this.locationRepository.remove(location);
-      return okAsync(id);
-    } catch (error) {
-      console.log("LocationService.delete", error);
-      return errAsync(null);
-    }
-  }
-  public async create(
-    countryName: string,
-    cities?: string[]
-  ): Promise<ResultAsync<LocationEntity, null>> {
-    const existingLocation = await this.locationRepository.findOne({
-      where: { countryName },
-      relations: this._relations,
-    });
+	public async delete(id: string): Promise<ResultAsync<string, null>> {
+		try {
+			const location = await this._findById(id);
+			if (!location) {
+				throw new Error("Location not found");
+			}
+			await this.locationRepository.remove(location);
+			return okAsync(id);
+		} catch (error) {
+			console.log("LocationService.delete", error);
+			return errAsync(null);
+		}
+	}
+	public async create(
+		countryName: string,
+		cities?: string[]
+	): Promise<ResultAsync<LocationEntity, null>> {
+		const existingLocation = await this.locationRepository.findOne({
+			where: { countryName },
+			relations: this._relations,
+		});
 
-    try {
-      const country = existingLocation
-        ? existingLocation
-        : new LocationEntity();
-      country.countryName = countryName;
-      country.cities = [];
+		try {
+			const country = existingLocation
+				? existingLocation
+				: new LocationEntity();
+			country.countryName = countryName;
+			country.cities = [];
 
-      cities?.forEach((cityName) => {
-        const city = new CityEntity();
-        city.name = cityName;
+			cities?.forEach(cityName => {
+				const city = new CityEntity();
+				city.name = cityName;
 
-        country.cities.push(city);
-      });
+				country.cities.push(city);
+			});
 
-      const saved = await this.locationRepository.save(country);
-      const refreshed = await this._findById(saved.id);
-      return okAsync(refreshed);
-    } catch (error) {
-      console.log("LocationService.create", error);
-      return errAsync(null);
-    }
-  }
+			const saved = await this.locationRepository.save(country);
+			const refreshed = await this._findById(saved.id);
+			return okAsync(refreshed);
+		} catch (error) {
+			console.log("LocationService.create", error);
+			return errAsync(null);
+		}
+	}
 
-  public async update(
-    id: string,
-    {
-      cityIdsToRemove = [],
-      cityNamesToAdd = [],
-    }: {
-      cityNamesToAdd?: string[];
-      cityIdsToRemove?: string[];
-    }
-  ): Promise<ResultAsync<LocationEntity, null>> {
-    try {
-      const location = await this._findById(id);
-      if (!location) {
-        throw new Error("Location not found");
-      }
+	public async update(
+		id: string,
+		{
+			cityIdsToRemove = [],
+			cityNamesToAdd = [],
+		}: {
+			cityNamesToAdd?: string[];
+			cityIdsToRemove?: string[];
+		}
+	): Promise<ResultAsync<LocationEntity, null>> {
+		try {
+			const location = await this._findById(id);
+			if (!location) {
+				throw new Error("Location not found");
+			}
 
-      cityNamesToAdd.forEach((cityName) => {
-        const city = new CityEntity();
-        city.name = cityName;
+			cityNamesToAdd.forEach(cityName => {
+				const city = new CityEntity();
+				city.name = cityName;
 
-        location.cities.push(city);
-      });
+				location.cities.push(city);
+			});
 
-      cityIdsToRemove.forEach((cityId) => {
-        location.cities = location.cities.filter(
-          (city) => !cityIdsToRemove.includes(city.id)
-        );
-      });
+			cityIdsToRemove.forEach(cityId => {
+				location.cities = location.cities.filter(
+					city => !cityIdsToRemove.includes(city.id)
+				);
+			});
 
-      const saved = await this.locationRepository.save(location);
-      const refreshed = await this._findById(saved.id);
-      return okAsync(refreshed);
-    } catch (e) {
-      console.log("LocationService.update", e);
-      return errAsync(null);
-    }
-  }
+			const saved = await this.locationRepository.save(location);
+			const refreshed = await this._findById(saved.id);
+			return okAsync(refreshed);
+		} catch (e) {
+			console.log("LocationService.update", e);
+			return errAsync(null);
+		}
+	}
 
-  public async findAll(): Promise<ResultAsync<LocationEntity[], null>> {
-    try {
-      const locations = await this.locationRepository.find({
-        relations: this._relations,
-      });
-      return okAsync(locations);
-    } catch (error) {
-      console.log("LocationService.findAll", error);
-      return errAsync(null);
-    }
-  }
+	public async findAll(): Promise<ResultAsync<LocationEntity[], null>> {
+		try {
+			console.log("Finding all");
+
+			const locations = await this.locationRepository.find({
+				relations: this._relations,
+			});
+			return okAsync(locations);
+		} catch (error) {
+			console.log("LocationService.findAll", error);
+			return errAsync(null);
+		}
+	}
 }

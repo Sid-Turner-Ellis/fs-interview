@@ -16,11 +16,15 @@ type LocationEntity {
 }
 
 type Mutation {
-  createCity(cityName: String!, locationId: String!): LocationEntity!
+  createCity(name: String!): CityEntity!
   createLocation(cities: [String!]!, countryName: String!): LocationEntity!
+  deleteCity(id: String!): String!
   deleteLocation(id: String!): String!
+  updateCity(cityId: String!, cityNewName: String!): CityEntity!
 }
 
 type Query {
+  getAllCities: [CityEntity!]!
   getAllLocations: [LocationEntity!]!
+  getCity(id: String!): CityEntity!
 }
