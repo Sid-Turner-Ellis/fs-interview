@@ -1,7 +1,8 @@
-import { countryMappings } from "./resources/country";
+import { countryMappings, cityMappings } from "./resources";
 
 const mappings = {
   country: countryMappings,
+  city: cityMappings,
 };
 
 const getMapper = (resourceName, methodName) => {

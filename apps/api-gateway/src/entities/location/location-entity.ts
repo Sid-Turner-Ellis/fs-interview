@@ -25,6 +25,8 @@ export class LocationEntity {
   cities: CityEntity[];
 }
 
+//WOULD SEPARATE INTO DIFFERENT FILE
+
 @Entity()
 @ObjectType()
 export class CityEntity {
